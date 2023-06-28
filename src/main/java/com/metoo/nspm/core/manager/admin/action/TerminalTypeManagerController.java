@@ -29,12 +29,14 @@ public class TerminalTypeManagerController {
 //        return ResponseUtil.ok(list);
 //    }
 
-
     @GetMapping
     public Object terminal(){
         Map params = new HashMap();
         params.put("diff", 1);
+        params.put("orderBy", "sequence");
+        params.put("orderType", "DESC");
         List<DeviceType> deviceTypes = this.deviceTypeService.selectObjByMap(params);
         return ResponseUtil.ok(deviceTypes);
     }
+
 }

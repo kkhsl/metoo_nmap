@@ -117,7 +117,7 @@ public class RsmsDeviceManagerController {
             });
         }
         Map map = new HashMap();
-        // 设备类型
+        // 设备类型term
         Map parmas = new HashMap();
         parmas.put("diff", 0);
         parmas.put("orderBy", "sequence");

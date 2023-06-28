@@ -21,11 +21,11 @@ public class ProblemServiceImpl implements IProblemService {
     @Autowired
     private ProblemMapper problemMapper;
     @Autowired
-    private NspmProblemMapper nspmProoblemMapper;
+    private NspmProblemMapper nspmProblemMapper;
 
     @Override
     public Problem selectObjById(Long id) {
-        return this.nspmProoblemMapper.selectObjById(id);
+        return this.nspmProblemMapper.selectObjById(id);
     }
 
     @Override
@@ -34,19 +34,19 @@ public class ProblemServiceImpl implements IProblemService {
             dto = new NspmProblemDTO();
         }
         Page<Problem> page = PageHelper.startPage(dto.getCurrentPage(), dto.getPageSize());
-        this.nspmProoblemMapper.selectObjConditionQuery(dto);
+        this.nspmProblemMapper.selectObjConditionQuery(dto);
         return page;
     }
 
     @Override
     public List<Problem> selectObjByMap(Map params) {
-        return this.nspmProoblemMapper.selectObjByMap(params);
+        return this.nspmProblemMapper.selectObjByMap(params);
     }
 
     @Override
     public int update(Problem instance) {
         try {
-            return this.nspmProoblemMapper.update(instance);
+            return this.nspmProblemMapper.update(instance);
         } catch (Exception e) {
             e.printStackTrace();
             return 0;
@@ -60,11 +60,11 @@ public class ProblemServiceImpl implements IProblemService {
 
     @Override
     public void truncateTable() {
-        this.nspmProoblemMapper.truncateTable();
+        this.nspmProblemMapper.truncateTable();
     }
 
     @Override
     public void copyProblemTemp(Map params) {
-        this.nspmProoblemMapper.copyProblemTemp(params);
+        this.nspmProblemMapper.copyProblemTemp(params);
     }
 }

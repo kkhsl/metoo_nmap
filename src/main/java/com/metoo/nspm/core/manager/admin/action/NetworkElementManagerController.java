@@ -212,6 +212,7 @@ public class NetworkElementManagerController {
                             && !e.getDeviceTypeId().equals("")){
                         DeviceType deviceType = this.deviceTypeService.selectObjById(e.getDeviceTypeId());
                         e.setDeviceTypeName(deviceType.getName());
+                        e.setDeviceTypeUuid(deviceType.getUuid());
                     }
                 });
                 map.put(uuid, terminals);

@@ -4,6 +4,7 @@ import com.github.pagehelper.Page;
 import com.metoo.nspm.dto.DeviceTypeDTO;
 import com.metoo.nspm.entity.nspm.DeviceType;
 import com.metoo.nspm.vo.DeviceTypeVO;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -43,5 +44,8 @@ public interface IDeviceTypeService {
     int delete(Long id );
 
     int batcheDel(Long[] ids);
+
+//    String saveAndUpload(DeviceType instance, MultipartFile onlineFile, MultipartFile offlineFile);
+    Object saveAndUpload(DeviceType instance, MultipartFile onlineFile, MultipartFile offlineFile);
 }
 

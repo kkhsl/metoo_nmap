@@ -1,13 +1,14 @@
-FROM openjdk:8-jdk-alpine
+FROM java:8
 
 MAINTAINER whhc
 
-WORKDIR /opt/java/project/nmap/release
+WORKDIR /
 
-ADD nmap.jar /opt/java/project/nmap/release/nmap.jar
+ADD nmap.jar /opt/nmap/service/nmap/nmap.jar
 
-EXPOSE 8080
+EXPOSE 7070
 
-ENTRYPOINT ["java", "-server", "-Xms512m", "-Xmx512m", "-jar", "/opt/java/project/nmap/release/nmap.jar"]
+
+ENTRYPOINT ["java", "-server", "-Xms.512m", "-Xmx512m", "-jar", "/opt/java/project/nmap/release/nmap.jar"]
 
 

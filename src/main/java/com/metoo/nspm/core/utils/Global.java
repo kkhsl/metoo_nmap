@@ -13,6 +13,10 @@ public class Global {
     public static final String DBPATH = "/opt/nmap/resource/db";
     public static final String DBNAME = "nmap";
     public static final String DBPATHLOCAL = "C:\\Users\\Administrator\\Desktop\\backup\\dblocal";
+
+
+//    public static final String WEBTERMINALPATH = "C:\\Users\\Administrator\\Desktop\\backup\\dblocal";
+    public static final String WEBTERMINALPATH = "/opt/nmap/service/www/deviceImg/dt";
 //    public static final String DBPATH = "C:\\Users\\Administrator\\Desktop\\backup\\db";
 
 

@@ -70,6 +70,9 @@
             <if test="objectid != null and objectid != ''">
                 AND objectid is not null
             </if>
+            <if test="affirm != null and affirm != ''">
+                AND affirm = #{affirm}
+            </if>
         </where>
         <if test = "orderBy != null and orderBy != ''">
             ORDER BY ${orderBy}

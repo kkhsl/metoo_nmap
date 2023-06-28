@@ -171,6 +171,13 @@ public class TerminalManagerController {
                         e.setProjectName(project.getName());
                     }
                 }
+//                if(e.getDeviceTypeId() != null){
+//                    DeviceType deviceType = this.deviceTypeService.selectObjById(e.getDeviceTypeId());
+//                    if(deviceType != null){
+//                        e.setDeviceName(deviceType.getName());
+//
+//                    }
+//                }
             });
         }
         Map map = new HashMap();
@@ -456,9 +463,7 @@ public class TerminalManagerController {
         return ResponseUtil.badArgument("请选择终端");
     }
 
-//    @GetMapping(value = {"/addresses/{id}/{path}", "/addresses/{id}", "/addresses"})
-//    @DeleteMapping(value = {"/{id}","/{ids}"})
-    @DeleteMapping
+    @DeleteMapping(value = {"/{id}","/{ids}"})
     public Object delete(Long id, String ids){
         if(Strings.isNotBlank(ids) && ids.split(",").length > 0){
             String[] idList = ids.split(",");
@@ -477,7 +482,6 @@ public class TerminalManagerController {
                 }
             }
         }
-
         return ResponseUtil.badArgument();
     }
 

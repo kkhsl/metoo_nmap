@@ -95,6 +95,7 @@ public class TopologyManagerApi {
                             DeviceType deviceType = this.deviceTypeService.selectObjById(e.getDeviceTypeId());
                             if(deviceType != null){
                                 e.setDeviceTypeName(deviceType.getName());
+                                e.setDeviceTypeUuid(deviceType.getUuid());
                             }
                         }
                     });

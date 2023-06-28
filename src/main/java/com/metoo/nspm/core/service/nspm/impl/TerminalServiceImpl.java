@@ -198,9 +198,12 @@ public class TerminalServiceImpl implements ITerminalService {
                     Terminal terminal = new Terminal();
                     BeanUtils.copyProperties(e, terminal);
                     terminal.setOnline(true);
-                    DeviceType deviceType = this.deviceTypeService.selectObjByName("台式电脑");
-                    if(deviceType != null){
-                        terminal.setDeviceTypeId(deviceType.getId());
+                    params.clear();
+                    params.put("type", 14);
+                    List<DeviceType> deviceTypes = this.deviceTypeService.selectObjByMap(params);
+                    if(deviceTypes != null && deviceTypes.size() > 0){
+                        terminal.setDeviceTypeId(deviceTypes.get(0).getId());
+                        terminal.setName(deviceTypes.get(0).getName());
                     }
                     if(e.getInterfaceName() == null || e.getInterfaceName().equals("PortN") || e.getInterfaceName().contains("Port")){
                         terminal.setInterfaceStatus(1);
@@ -208,7 +211,7 @@ public class TerminalServiceImpl implements ITerminalService {
                     }else{
                         terminal.setInterfaceStatus(ifup);
                     }
-                    terminal.setName("台式电脑");
+
                     this.terminalMapper.insert(terminal);
                     ids.add(terminal.getId());
                 }

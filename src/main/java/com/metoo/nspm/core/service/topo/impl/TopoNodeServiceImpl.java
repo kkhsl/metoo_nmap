@@ -2,13 +2,10 @@ package com.metoo.nspm.core.service.topo.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.metoo.nspm.core.manager.myzabbix.utils.ItemUtil;
 import com.metoo.nspm.core.manager.zabbix.tools.InterfaceUtil;
 import com.metoo.nspm.core.service.nspm.INetworkElementService;
 import com.metoo.nspm.core.service.nspm.ISysConfigService;
-import com.metoo.nspm.core.service.nspm.IUserService;
 import com.metoo.nspm.core.service.topo.ITopoNodeService;
-import com.metoo.nspm.core.service.api.zabbix.ZabbixHostInterfaceService;
 import com.metoo.nspm.core.utils.NodeUtil;
 import com.metoo.nspm.dto.TopoNodeDto;
 import com.metoo.nspm.entity.nspm.NetworkElement;
@@ -30,13 +27,7 @@ public class TopoNodeServiceImpl implements ITopoNodeService {
     @Autowired
     private NodeUtil nodeUtil;
     @Autowired
-    private IUserService userService;
-    @Autowired
     private INetworkElementService networkElementService;
-    @Autowired
-    private ZabbixHostInterfaceService zabbixHostInterfaceService;
-    @Autowired
-    private ItemUtil itemUtil;
     @Autowired
     private InterfaceUtil interfaceUtil;
 

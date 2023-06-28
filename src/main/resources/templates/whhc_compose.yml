@@ -1,0 +1,47 @@
+version: "3"
+
+services:
+  microService:
+    image: nmap:1.0
+    container_name: whhc-nmap
+    ports:
+      - "7071:8970"
+    networks:
+      - whhc_network
+    depends_on:
+      - whhc-mysql
+      - whhc-redis
+
+  whhc-redis:
+    image: redis:latest
+    container_name: whhc-redis
+    environment:
+      REDIS_PASSWORD: 'metoo89745000'
+    ports:
+      - "6379:6379"
+    volumes:
+      - /opt/docker/container/volumes/redis/config/redis.conf:/etc/redis/redis.conf
+      - /opt/docker/container/volumes/redis/data:/data
+    networks:
+      - whhc_network
+    command: redis-server /etc/redis/redis.conf
+
+  whhc-mysql:
+    image: mysql:8.0
+    container_name: whhc-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 'metoo89745000'
+      MYSQL_ALLOW_ENPTY_PASSWORD: 'no'
+    ports:
+    - "33061:3306"
+    volumes:
+      - /opt/docker/container/volumes/mysql/db:/var/lib/mysql
+      - /opt/docker/container/volumes/mysql/conf/my.cnf:/etc/my.cnf
+      - /opt/docker/container/volumes/mysql/init:/docker-entrypoint-initdb.d
+    networks:
+    - whhc_network
+    command:
+      --default-authentication-plugin=mysql_native_password #解决外部无法访问 --sql_mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION
+
+networks:
+  whhc_network:

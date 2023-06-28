@@ -25,4 +25,6 @@ public class DeviceType extends IdEntity {
 
     private Integer sequence;
     private Integer diff;
+
+    private String uuid;// 可用作自定义图片名称
 }

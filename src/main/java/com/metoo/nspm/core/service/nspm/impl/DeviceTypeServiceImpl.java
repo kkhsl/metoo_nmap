@@ -4,25 +4,32 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.metoo.nspm.core.mapper.nspm.DeviceTypeMapper;
 import com.metoo.nspm.core.service.nspm.IDeviceTypeService;
+import com.metoo.nspm.core.utils.Global;
+import com.metoo.nspm.core.utils.ResponseUtil;
+import com.metoo.nspm.core.utils.file.UploadFileUtil;
 import com.metoo.nspm.dto.DeviceTypeDTO;
 import com.metoo.nspm.entity.nspm.DeviceType;
 import com.metoo.nspm.vo.DeviceTypeVO;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class DeviceTypeServiceImpl implements IDeviceTypeService {
 
     @Autowired
     private DeviceTypeMapper deviceTypeMapper;
+    @Autowired
+    private UploadFileUtil uploadFileUtil;
 
     @Override
     public DeviceType selectObjById(Long id) {
@@ -95,12 +102,19 @@ public class DeviceTypeServiceImpl implements IDeviceTypeService {
     public int save(DeviceType instance) {
         if(instance.getId() == null || instance.getId().equals("")){
             instance.setAddTime(new Date());
+            instance.setUuid(UUID.randomUUID().toString());
         }
         if(instance.getId() == null || instance.getId().equals("")){
+
+            //设置回滚点,只回滚以下异常
+            Object savePoint = TransactionAspectSupport.currentTransactionStatus().createSavepoint();
             try {
-                return this.deviceTypeMapper.save(instance);
+                int i = this.deviceTypeMapper.save(instance);
+                int n = 10 / 0;
+                return i;
             } catch (Exception e) {
-                e.printStackTrace();
+                e.printStackTrace();//手工回滚异常
+                TransactionAspectSupport.currentTransactionStatus().rollbackToSavepoint(savePoint);
                 return 0;
             }
         }else{
@@ -111,7 +125,6 @@ public class DeviceTypeServiceImpl implements IDeviceTypeService {
                 return 0;
             }
         }
-
     }
 
     @Override
@@ -142,5 +155,60 @@ public class DeviceTypeServiceImpl implements IDeviceTypeService {
             e.printStackTrace();
             return 0;
         }
+    }
+
+    @Override
+    public Object saveAndUpload(DeviceType instance, MultipartFile onlineFile, MultipartFile offlineFile) {
+        String uuid = UUID.randomUUID().toString();
+        if(instance.getId() == null || instance.getId().equals("")){
+            instance.setAddTime(new Date());
+            instance.setUuid(uuid);
+        }else{
+            DeviceType deviceType = this.deviceTypeMapper.selectObjById(instance.getId());
+            uuid = deviceType.getUuid();
+        }
+        //设置回滚点,只回滚以下异常
+        Object savePoint = TransactionAspectSupport.currentTransactionStatus().createSavepoint();
+        if(instance.getId() == null || instance.getId().equals("")){
+            try {
+                this.deviceTypeMapper.save(instance);
+            } catch (Exception e) {
+                e.printStackTrace();
+                TransactionAspectSupport.currentTransactionStatus().rollbackToSavepoint(savePoint);
+                return ResponseUtil.error("保存失败");
+            }
+        }else{
+            try {
+                this.deviceTypeMapper.update(instance);
+            } catch (Exception e) {
+                e.printStackTrace();
+                TransactionAspectSupport.currentTransactionStatus().rollbackToSavepoint(savePoint);
+                return ResponseUtil.error("保存失败");
+            }
+        }
+        if(uuid != null){
+            if(onlineFile != null){
+                try {
+                    uploadFileUtil.uploadFile(onlineFile, uuid, Global.WEBTERMINALPATH);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    TransactionAspectSupport.currentTransactionStatus().rollbackToSavepoint(savePoint);
+                    this.uploadFileUtil.deleteFile(uuid, Global.WEBTERMINALPATH);
+                    return ResponseUtil.badArgument("在线图片上传失败");
+                }
+            }
+           if(offlineFile != null){
+               try {
+                   uploadFileUtil.uploadFile(offlineFile, uuid + "_0", Global.WEBTERMINALPATH);
+               } catch (Exception e) {
+                   e.printStackTrace();
+                   TransactionAspectSupport.currentTransactionStatus().rollbackToSavepoint(savePoint);
+                   this.uploadFileUtil.deleteFile(uuid, Global.WEBTERMINALPATH);
+                   this.uploadFileUtil.deleteFile(uuid + "_0", Global.WEBTERMINALPATH);
+                   return ResponseUtil.badArgument("离线图片上传失败");
+               }
+           }
+        }
+        return ResponseUtil.ok();
     }
 }

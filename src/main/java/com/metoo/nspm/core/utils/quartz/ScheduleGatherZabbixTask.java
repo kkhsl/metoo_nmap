@@ -183,7 +183,7 @@ public class ScheduleGatherZabbixTask {
     @Scheduled(cron = "0 */1 * * * ?")
     public void updateRout(){
 //        ThreadContext.bind(manager);
-        if(flag) {
+        if(false) {
             Map params = new HashMap();
             Calendar calendar = Calendar.getInstance();
             params.put("endClock", DateTools.getTimesTamp10(calendar.getTime()));

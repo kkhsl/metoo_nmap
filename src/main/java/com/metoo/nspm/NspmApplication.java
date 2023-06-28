@@ -44,7 +44,7 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 //@SpringBootApplication(exclude = {NspmDataSourceConfig.class, DataSourceConfig.class, TopologyDataSourceConfig.class}) // 申明让spring boot自动给程序进行必要的配置 == @Configuration ，@EnableAutoConfiguration 和 @ComponentScan
 //@MapperScan
 @EnableScheduling // 开启定时任务（启动类增加该注解，使项目启动后执行定时任务）
-@ServletComponentScan(basePackages ={ "com.metoo.nspm"})//只用注解配置时，需要扫描包
+//@ServletComponentScan(basePackages ={ "com.metoo.nspm"})//只用注解配置时，需要扫描包
 @SpringBootApplication(exclude = DataSourceAutoConfiguration.class)
 @EnableTransactionManagement
 public class NspmApplication extends SpringBootServletInitializer {

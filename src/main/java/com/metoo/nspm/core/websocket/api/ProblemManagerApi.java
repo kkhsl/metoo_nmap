@@ -10,6 +10,7 @@ import com.metoo.nspm.dto.NspmProblemDTO;
 import com.metoo.nspm.entity.zabbix.Problem;
 import io.swagger.annotations.ApiOperation;
 import org.apache.catalina.connector.ClientAbortException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -97,7 +98,6 @@ public class ProblemManagerApi {
         return rep;
     }
 
-
     @ApiOperation("告警信息(分页查询)")
     @GetMapping("/all")
     public NoticeWebsocketResp problempAll(
@@ -108,6 +108,7 @@ public class ProblemManagerApi {
         Map<String, Object> param = JSONObject.parseObject(String.valueOf(requestParam.get("params")), Map.class);
         dto.setCurrentPage(Integer.parseInt(param.get("currentPage").toString()));
         dto.setPageSize(Integer.parseInt(param.get("pageSize").toString()));
+        dto.setAffirm(param.get("affirm") ==  null || param.get("affirm").equals("") ? null : Integer.parseInt(param.get("affirm").toString()));
         Page<Problem> page = this.problemService.selectConditionQuery(dto);
         NoticeWebsocketResp rep = new NoticeWebsocketResp();
         rep.setNoticeType("8");

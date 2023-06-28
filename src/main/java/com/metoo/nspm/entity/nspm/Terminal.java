@@ -82,6 +82,8 @@ public class Terminal extends IdEntity {
     private Long deviceTypeId;
     @ApiModelProperty("设备类型名称")
     private String deviceTypeName;
+    @ApiModelProperty("设备类型Uuid")
+    private String deviceTypeUuid;
 
     // 增加属性
     @ApiModelProperty("主机名")

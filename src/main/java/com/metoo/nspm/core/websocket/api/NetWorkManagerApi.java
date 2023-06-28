@@ -327,6 +327,7 @@ public class NetWorkManagerApi {
                                                 DeviceType deviceType = this.deviceTypeService.selectObjById(e.getDeviceTypeId());
                                                 if(deviceType != null){
                                                     e.setDeviceTypeName(deviceType.getName());
+                                                    e.setDeviceTypeUuid(deviceType.getUuid());
                                                 }
                                             });
                                             this.macUtil.terminalJoint(terminals);
@@ -384,6 +385,7 @@ public class NetWorkManagerApi {
                                 DeviceType deviceType = this.deviceTypeService.selectObjById(terminal.getDeviceTypeId());
                                 if(deviceType != null){
                                     terminal.setDeviceTypeName(deviceType.getName());
+                                    terminal.setDeviceTypeUuid(deviceType.getUuid());
                                 }
                                 list.add(terminal);
                             }
