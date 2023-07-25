@@ -245,5 +245,6 @@
     <orderEntry type="library" name="Maven: org.bouncycastle:bcprov-jdk14:1.38" level="project" />
     <orderEntry type="library" name="Maven: org.bouncycastle:bcmail-jdk14:1.38" level="project" />
     <orderEntry type="library" name="Maven: org.xhtmlrenderer:flying-saucer-core:9.0.9" level="project" />
+    <orderEntry type="library" name="Maven: org.syslog4j:syslog4j:0.9.46" level="project" />
   </component>
 </module>

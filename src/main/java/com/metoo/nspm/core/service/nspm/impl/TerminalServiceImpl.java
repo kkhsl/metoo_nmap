@@ -142,18 +142,18 @@ public class TerminalServiceImpl implements ITerminalService {
         List<Mac> macs = this.macService.selectByMap(params);
         if(macs.size() < 0){
             List<Terminal> terminals = this.terminalMapper.selectObjByMap(null);
-            terminals = terminals.stream().map(e -> {
-                        if(e.getOnline()){
-                            e.setOnline(false);
-                            if(e.getInterfaceName().equals("PortN") || e.getInterfaceName().contains("Port")){
-                                e.setInterfaceStatus(1);
-                            }
-                            return e;
-                        }
-                        return null;
-                    }
-            ).collect(Collectors.toList());
             if(terminals.size() > 0){
+                terminals = terminals.stream().map(e -> {
+                            if(e.getOnline()){
+                                e.setOnline(false);
+                                if(e.getInterfaceName().equals("PortN") || e.getInterfaceName().contains("Port")){
+                                    e.setInterfaceStatus(1);
+                                }
+                                return e;
+                            }
+                            return null;
+                        }
+                ).collect(Collectors.toList());
                 this.terminalMapper.batchUpdate(terminals);
             }
         }else{

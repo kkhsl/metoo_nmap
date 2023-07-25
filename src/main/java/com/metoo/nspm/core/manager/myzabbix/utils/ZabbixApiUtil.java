@@ -16,6 +16,7 @@ import java.util.Map;
 public class ZabbixApiUtil {
 
     public static String BASE_URL;
+
     public static final String USER = "Admin";// 默认账号
 //    public static final String PASSWORD = "zabbix";// 默认密码
     public static final String PASSWORD = "Metoo@2023";// 默认密码

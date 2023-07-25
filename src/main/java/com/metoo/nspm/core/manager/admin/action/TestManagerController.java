@@ -11,6 +11,7 @@ import com.metoo.nspm.dto.NspmProblemDTO;
 import com.metoo.nspm.entity.nspm.Rack;
 import com.metoo.nspm.entity.nspm.User;
 import com.metoo.nspm.entity.zabbix.Problem;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -157,5 +158,25 @@ public class TestManagerController {
         System.out.println(flag1);
     }
 
+    // 测试 == equals
+    @Test
+    public void testEquals(){
+        int a = 10;
+        int b = 10;
+        System.out.println(a == b);
 
+        Integer n = 10;
+        Integer m = 10;
+        System.out.println(n == m);
+        System.out.println(n.equals(m));
+
+        Integer j = new Integer(10);
+        Integer g = new Integer(10);
+        System.out.println(j);
+        System.out.println(g);
+        System.out.println(j == g);// 如果是引用类型则比较对象的内存地址
+        System.out.println(j.equals(g));
+
+
+    }
 }

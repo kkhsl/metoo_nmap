@@ -122,7 +122,6 @@ public class LoginController{
 
     @GetMapping("/captcha")
     public void captcha(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
 //        System.out.println("Arp开始采集: " + System.currentTimeMillis());
 //        // 采集时间
 //        Calendar cal = Calendar.getInstance();

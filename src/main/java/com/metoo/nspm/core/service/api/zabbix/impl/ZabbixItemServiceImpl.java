@@ -570,13 +570,15 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
             }
             String parentIp = this.getParentIp(ip, parentMask);
             parentIp = parentIp + "/" + parentMask;
-            if (parentMap.get(parentIp) == null) {
+            if (!parentMap.keySet().contains(parentIp) && parentMap.get(parentIp) == null) {
                 List<Object> list = new ArrayList<>();
                 list.add(ip + "/" + maskBit);
                 parentMap.put(parentIp, list);
             } else {
                 List<Object> list = parentMap.get(parentIp);
-                list.add(ip + "/" + maskBit);
+                if(list != null){
+                    list.add(ip + "/" + maskBit);
+                }
             }
         }
 //        遍历
@@ -601,7 +603,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
                 parentIndex =  parentIpMask.indexOf(".");
             }
             parentIpSeggment = parentIpMask.substring(0, parentIndex);
-            parentSegment.put(parentIpSeggment, parentIp);
+            parentSegment.put(parentIpSeggment, parentIpMask);
         }
 
         // 判断是否属于第一级
@@ -624,6 +626,8 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
             if(parentSegment.get(ip_segment) != null){
                 List<Object> list = parentMap.get(parentSegment.get(ip_segment));
                 list.add(ip + "/" + mask);
+
+
             }else{
                 Integer parentMask = null;
                 if (mask > 24) {
@@ -1061,7 +1065,7 @@ public class ZabbixItemServiceImpl implements ZabbixItemService {
         params.put("tag", "S");
         List<MacTemp> residueS = this.macTempService.selectTagByMap(params);
         residueS.stream().map(e ->
-            e.setTag("RT")
+                e.setTag("RT")
         ).collect(Collectors.toList());
         if(residueS.size() > 0){
             this.macTempService.batchUpdate(residueS);

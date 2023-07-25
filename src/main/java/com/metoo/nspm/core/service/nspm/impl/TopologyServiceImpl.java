@@ -165,12 +165,13 @@ public class TopologyServiceImpl implements ITopologyService {
                     if(linkList1.size() == 0){
                         Link link1 = new Link();
                         link1.setAddTime(new Date());
-                        link1.setStartDevice(fromNode.get("name").toString());
-                        link1.setStartInterface(link.get("fromPort").toString());
-                        link1.setStartIp(fromNode.get("ip").toString());
-                        link1.setEndDevice(toNode.get("name").toString());
-                        link1.setEndInterface(link.get("toPort").toString());
-                        link1.setEndIp(toNode.get("ip").toString());
+                        link1.setStartDevice(String.valueOf(fromNode.get("name")));
+                        link1.setStartInterface(String.valueOf(link.get("fromPort")));
+                        link1.setStartIp(String.valueOf(fromNode.get("ip")));
+                        link1.setEndDevice(String.valueOf(toNode.get("name")));
+                        link1.setEndInterface(String.valueOf(link.get("toPort")));
+                        link1.setEndIp(String.valueOf(toNode.get("ip")));
+
                         User user = ShiroUserHolder.currentUser();
                         if(link1.getGroupId() == null){
                             link1.setGroupId(user.getGroupId());

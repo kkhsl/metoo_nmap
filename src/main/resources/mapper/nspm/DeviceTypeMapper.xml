@@ -93,6 +93,9 @@
             <if test="name != null and name != ''">
                 AND `name` = #{name}
             </if>
+            <if test="type != null and type != ''">
+                AND `type` = #{type}
+            </if>
             <if test="deviceTypeId != null and deviceTypeId != ''">
                 AND id != #{deviceTypeId}
             </if>
