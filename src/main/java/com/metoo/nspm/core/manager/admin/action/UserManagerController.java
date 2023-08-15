@@ -88,7 +88,7 @@ public class UserManagerController {
         return ResponseUtil.ok(map);
     }*/
 
-//    @RequiresPermissions(value = {"LK:USER", "LK:USER:MANAGER"})
+    //    @RequiresPermissions(value = {"LK:USER", "LK:USER:MANAGER"})
     @ApiOperation("用户更新")
     @PostMapping("/update")
     public Object update(@RequestBody(required = false) UserDto dto) {
@@ -194,26 +194,26 @@ public class UserManagerController {
             if (StringUtil.isEmpty(dto.getUsername())) {// 新增时必须验证密码
                 return ResponseUtil.badArgument("请输入用户名");
             }
-            if(dto.getId() != null && dto.getPassword() == null && dto.getVerifyPassword() == null){
+            if (dto.getId() != null && dto.getPassword() == null && dto.getVerifyPassword() == null) {
                 return ResponseUtil.badArgument("参数错误");
             }
 
             // 验证密码参数
-            if(dto.getId() == null){
+            if (dto.getId() == null) {
                 if (dto.getId() == null && StringUtils.isEmpty(dto.getPassword())) {
                     return ResponseUtil.badArgument("请输入密码");
                 }
                 if (dto.getId() == null && StringUtils.isEmpty(dto.getVerifyPassword())) {
                     return ResponseUtil.badArgument("请输入确认密码");
                 }
-            }else{
-                if(!StringUtils.isEmpty(dto.getPassword())){
-                    if(StringUtils.isEmpty(dto.getVerifyPassword())){
+            } else {
+                if (!StringUtils.isEmpty(dto.getPassword())) {
+                    if (StringUtils.isEmpty(dto.getVerifyPassword())) {
                         return ResponseUtil.badArgument("请输入确认密码");
                     }
                 }
-                if(!StringUtils.isEmpty(dto.getVerifyPassword())){
-                    if(StringUtils.isEmpty(dto.getPassword())){
+                if (!StringUtils.isEmpty(dto.getVerifyPassword())) {
+                    if (StringUtils.isEmpty(dto.getPassword())) {
                         return ResponseUtil.badArgument("请输入密码");
                     }
                 }
@@ -243,7 +243,7 @@ public class UserManagerController {
             if (this.userService.save(dto)) {
                 // 判断是否为本人
                 User currentUser = ShiroUserHolder.currentUser();
-                if(currentUser.getUsername().equals(dto.getUsername())){
+                if (currentUser.getUsername().equals(dto.getUsername())) {
                     SecurityUtils.getSubject().logout();
                 }/*else{
                     // 退出指定用户
@@ -265,7 +265,7 @@ public class UserManagerController {
         User user = this.userService.findObjById(dto.getId());
         if (user != null) {
             // 判断用户是否为管理员
-            if(user.getType() == 1){
+            if (user.getType() == 1) {
                 return ResponseUtil.badArgument("删除失败");
             }
             user.setDeleteStatus(-1);
@@ -332,7 +332,7 @@ public class UserManagerController {
         if (dto != null && dto.getId() != null) {
             User currentUser = ShiroUserHolder.currentUser();
             User user = this.userService.findObjById(dto.getId());
-            if(currentUser.getUsername().equals(user.getUsername())){
+            if (currentUser.getUsername().equals(user.getUsername())) {
                 if (!StringUtils.isEmpty(dto.getPassword()) || !StringUtils.isEmpty(dto.getVerifyPassword())) {
                     String oldPassword = CommUtils.password(dto.getOldPassword(), currentUser.getSalt());
                     if (!currentUser.getPassword().equals(oldPassword)) {

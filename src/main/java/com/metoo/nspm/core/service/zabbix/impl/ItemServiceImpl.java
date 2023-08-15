@@ -17,12 +17,10 @@ import com.metoo.nspm.core.service.zabbix.ItemService;
 import com.metoo.nspm.core.utils.MyStringUtils;
 import com.metoo.nspm.core.utils.network.IpUtil;
 import com.metoo.nspm.core.utils.network.IpV4Util;
-import com.metoo.nspm.core.utils.thread.ThreadPool;
 import com.metoo.nspm.entity.nspm.*;
 import com.metoo.nspm.entity.zabbix.Interface;
 import com.metoo.nspm.entity.zabbix.Item;
 import com.metoo.nspm.entity.zabbix.ItemTag;
-import io.swagger.models.auth.In;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.logging.log4j.util.Strings;
@@ -32,16 +30,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import static java.lang.Thread.sleep;
 
 @Service
 //@Transactional(rollbackFor = Exception.class)
@@ -89,6 +83,7 @@ public class ItemServiceImpl implements ItemService {
     private IDeviceTypeService deviceTypeService;
     @Autowired
     private InterfaceServiceImpl interfaceService;
+
     @Autowired
     private IHostSnmpService hostSnmpService;
 

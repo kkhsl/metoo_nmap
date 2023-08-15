@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.metoo.nspm.core.manager.admin.tools.RsmsDeviceUtils;
 import com.metoo.nspm.core.service.nspm.*;
-import com.metoo.nspm.core.service.topo.ITopoNodeService;
 import com.metoo.nspm.core.service.api.zabbix.ZabbixItemService;
 import com.metoo.nspm.core.utils.ResponseUtil;
 import com.metoo.nspm.core.utils.network.IpUtil;
@@ -13,14 +12,12 @@ import com.metoo.nspm.entity.nspm.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.logging.log4j.util.Strings;
-import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 @Api("子网管理")
 @RequestMapping("/admin/subnet")
@@ -203,12 +200,12 @@ public class SubnetManagerController {
 //    }
 
     @RequestMapping(value = {"/comb"})
-    public Object comb(){
+    public Object comb() {
         Map params = new HashMap();
         params.put("NotIp", IpUtil.ipConvertDec("127.0.0.1"));
         List<IpAddress> ipAddresses = this.ipAddressService.selectObjByMap(params);
         Map<String, List<Object>> map = this.zabbixItemService.ipAddressCombingByDB(ipAddresses);
-        for (String key : map.keySet()){
+        for (String key : map.keySet()) {
             int index = key.indexOf("/");
             String firstIp = key.substring(0, index);
             int firstMask = Integer.parseInt(key.substring(index + 1));
@@ -216,10 +213,10 @@ public class SubnetManagerController {
             // 插如一级ip网段
             Long firstSubnetId = null;
             Subnet firstSubnet = this.subnetService.selectObjByIpAndMask(firstIp, firstMask);
-            if(firstSubnet != null){
+            if (firstSubnet != null) {
                 firstSubnetId = firstSubnet.getId();
             }
-            if(firstSubnet == null){
+            if (firstSubnet == null) {
                 Subnet subnet = new Subnet();
                 subnet.setIp(IpUtil.ipConvertDec(firstIp));
                 subnet.setMask(firstMask);
@@ -229,13 +226,13 @@ public class SubnetManagerController {
             // 获取二级网段
             JSONArray array = JSONArray.parseArray(JSON.toJSONString(map.get(key)));
             for (Object obj : array) {
-                if(obj instanceof String){
+                if (obj instanceof String) {
                     String second = ((String) obj).trim();
                     int sequence = second.indexOf("/");
                     String ip = second.substring(0, sequence);
                     int secondMask = Integer.parseInt(second.substring(sequence + 1));
                     Subnet secondSubnet = this.subnetService.selectObjByIpAndMask(ip, secondMask);
-                    if(secondSubnet == null){
+                    if (secondSubnet == null) {
                         Subnet subnet = new Subnet();
                         subnet.setIp(IpUtil.ipConvertDec(ip));
                         subnet.setMask(secondMask);
@@ -244,19 +241,19 @@ public class SubnetManagerController {
                         this.subnetService.save(subnet);
                     }
                 }
-                if(obj instanceof JSONObject){
+                if (obj instanceof JSONObject) {
                     JSONObject object = (JSONObject) obj;
-                    for (String okey : object.keySet()){
+                    for (String okey : object.keySet()) {
                         String second = okey.trim();
                         int sequence = second.indexOf("/");
                         String secondIp = second.substring(0, sequence);
                         int secondMask = Integer.parseInt(second.substring(sequence + 1));
                         Long secondSubnetId = null;
                         Subnet secondSubnet = this.subnetService.selectObjByIpAndMask(secondIp, secondMask);
-                        if(secondSubnet != null){
+                        if (secondSubnet != null) {
                             secondSubnetId = secondSubnet.getId();
                         }
-                        if(secondSubnet == null){
+                        if (secondSubnet == null) {
                             Subnet subnet = new Subnet();
                             subnet.setIp(IpUtil.ipConvertDec(secondIp));
                             subnet.setMask(secondMask);
@@ -267,13 +264,13 @@ public class SubnetManagerController {
                         }
                         JSONArray thirdArray = JSONArray.parseArray(object.get(okey).toString());
                         for (Object thirdKey : thirdArray) {
-                            if(obj instanceof JSONObject){
+                            if (obj instanceof JSONObject) {
                                 String third = ((String) thirdKey).trim();
                                 int thirdSequence = third.indexOf("/");
                                 String thirdIp = third.substring(0, thirdSequence);
                                 int thirdMask = Integer.parseInt(third.substring(thirdSequence + 1));
                                 Subnet thirdSubnet = this.subnetService.selectObjByIpAndMask(thirdIp, thirdMask);
-                                if(thirdSubnet == null){
+                                if (thirdSubnet == null) {
                                     Subnet subnet = new Subnet();
                                     subnet.setIp(IpUtil.ipConvertDec(thirdIp));
                                     subnet.setMask(thirdMask);
@@ -291,13 +288,13 @@ public class SubnetManagerController {
         // 获取所有子网一级
         List<Subnet> subnets = this.subnetService.selectSubnetByParentId(null);
         List<IpDetail> ipdetails = this.ipDetailService.selectObjByMap(null);
-        if(subnets.size() > 0) {
+        if (subnets.size() > 0) {
             int POOL_SIZE = Integer.max(Runtime.getRuntime().availableProcessors(), 0);
             ExecutorService exe = Executors.newFixedThreadPool(POOL_SIZE);
             exe.execute(new Runnable() {
                 @Override
                 public void run() {
-                    synchronized (this){
+                    synchronized (this) {
                         for (IpDetail ipDetail : ipdetails) {
                             if (ipDetail.getIp() != null) {
                                 if (ipDetail.getIp().equals("0.0.0.0")) {
@@ -316,7 +313,7 @@ public class SubnetManagerController {
                     }
                 }
             });
-            if(exe != null){
+            if (exe != null) {
                 exe.shutdown();
             }
         }
@@ -324,10 +321,10 @@ public class SubnetManagerController {
     }
 
     @RequestMapping("/list")
-    public Object list(){
+    public Object list() {
         // 获取所有子网一级
         List<Subnet> parentList = this.subnetService.selectSubnetByParentId(null);
-        if(parentList.size() > 0){
+        if (parentList.size() > 0) {
             for (Subnet subnet : parentList) {
                 this.genericSubnet(subnet);
             }
@@ -337,22 +334,23 @@ public class SubnetManagerController {
     }
 
     @GetMapping("/add")
-    public Object add(){
+    public Object add() {
         List<Domain> domains = this.domainService.selectDomainAndVlanByMap(null);
         return ResponseUtil.ok(domains);
     }
 
     /**
      * 网段编辑topology
+     *
      * @param
      * @return
      */
     @GetMapping("/update")
-    public Object update(@RequestParam Long id){
+    public Object update(@RequestParam Long id) {
         Subnet subnet = this.subnetService.selectObjById(id);
-        if(subnet.getVlanId() != null){
+        if (subnet.getVlanId() != null) {
             Vlan vlan = vlanService.selectObjById(subnet.getVlanId());
-            if(vlan != null){
+            if (vlan != null) {
                 subnet.setVlanId(vlan.getId());
                 subnet.setVlanName(vlan.getName());
             }
@@ -366,24 +364,24 @@ public class SubnetManagerController {
 
     @ApiOperation("网段编辑")
     @PostMapping
-    public Object save(@RequestBody Subnet subnet){
-        if(subnet.getId() == null){
+    public Object save(@RequestBody Subnet subnet) {
+        if (subnet.getId() == null) {
             return ResponseUtil.badArgument("不允许创建网段");
         }
-        if(subnet.getIp() != null && !subnet.getIp().equals("")){
+        if (subnet.getIp() != null && !subnet.getIp().equals("")) {
             return ResponseUtil.badArgument("网段ip不可编辑");
         }
-        if(subnet.getVlanId() != null){
+        if (subnet.getVlanId() != null) {
             Vlan vlan = vlanService.selectObjById(subnet.getVlanId());
-            if(vlan != null){
+            if (vlan != null) {
                 subnet.setVlanId(vlan.getId());
                 subnet.setVlanName(vlan.getName());
             }
         }
         int i = this.subnetService.update(subnet);
-        if(i >= 1){
+        if (i >= 1) {
             return ResponseUtil.ok();
-        }else{
+        } else {
             return ResponseUtil.error();
         }
     }
@@ -427,21 +425,21 @@ public class SubnetManagerController {
 //    }
 
     @ApiOperation("根据网段Ip查询直接从属子网")
-    @GetMapping(value = {"","/{id}"})
-    public Object getSubnet(@PathVariable(value = "id", required = false) Long id){
-        if(id == null){
+    @GetMapping(value = {"", "/{id}"})
+    public Object getSubnet(@PathVariable(value = "id", required = false) Long id) {
+        if (id == null) {
             // 获取所有子网一级
             List<Subnet> parentList = this.subnetService.selectSubnetByParentId(null);
-            if(parentList.size() > 0){
+            if (parentList.size() > 0) {
                 for (Subnet subnet : parentList) {
                     this.genericSubnet(subnet);
                 }
                 return ResponseUtil.ok(parentList);
             }
-        }else{
+        } else {
             // 校验子网是否存在
             Subnet subnet = this.subnetService.selectObjById(id);
-            if(subnet != null){
+            if (subnet != null) {
                 // 当前网段
                 Map map = new HashMap();
                 map.put("subnet", subnet);
@@ -450,20 +448,20 @@ public class SubnetManagerController {
                 //
                 map.put("subnets", subnetList);
                 // 查询IP addresses in subnets
-                if(subnetList.size() <= 0 && subnet.getMask() >= 24){
+                if (subnetList.size() <= 0 && subnet.getMask() >= 24) {
                     // 获取地址列表
                     // 获取最大Ip地址和最小Ip地址
                     String mask = IpUtil.bitMaskConvertMask(subnet.getMask());
                     Map networkMap = IpUtil.getNetworkIp(subnet.getIp(), mask);
                     String[] ips = IpUtil.getSubnetList(networkMap.get("network").toString(),
                             subnet.getMask());
-                    if(ips.length > 0){
+                    if (ips.length > 0) {
                         Map addresses = new LinkedHashMap();
-                        for(String ip : ips){
+                        for (String ip : ips) {
                             Address address = this.addressService.selectObjByIp(IpUtil.ipConvertDec(ip));
-                            if(address != null){
+                            if (address != null) {
                                 IpDetail ipDetail = this.ipDetailService.selectObjByIp(IpUtil.ipConvertDec(ip));
-                                if(ipDetail != null){
+                                if (ipDetail != null) {
                                     int time = ipDetail.getTime();
                                     // 每分钟采一次
                                     int hourAll = time / 60;// 一共多少小时
@@ -480,7 +478,7 @@ public class SubnetManagerController {
                         }
                         map.put("addresses", addresses);
                     }
-                }else if(subnetList.size() <= 0 && subnet.getMask() < 24 && subnet.getMask() >= 16){
+                } else if (subnetList.size() <= 0 && subnet.getMask() < 24 && subnet.getMask() >= 16) {
                     // 获取网段数量
                     String mask = IpUtil.bitMaskConvertMask(subnet.getMask());
                     Map networkMap = IpUtil.getNetworkIp(subnet.getIp(), mask);
@@ -488,7 +486,7 @@ public class SubnetManagerController {
                             subnet.getMask());
                     int sum = ips.length / 255;
                     List list = new ArrayList();
-                    if(sum > 0){
+                    if (sum > 0) {
                         for (int i = 0; i < sum; i++) {
                             String ip = subnet.getIp();
                             String[] seg = ip.split("\\.");
@@ -498,7 +496,7 @@ public class SubnetManagerController {
                         }
                     }
                     map.put("segmentation", list);
-                }else {
+                } else {
                     // 查询子网ip地址列表
                     Map params = new HashMap();
                     params.put("subnetId", subnet.getId());
@@ -513,17 +511,17 @@ public class SubnetManagerController {
     }
 
     @GetMapping("/ips/{id}/{ip}")
-    public Object getSubnetIp(@PathVariable(value = "id") Long id, @PathVariable(value = "ip") String ip){
-        if(id != null && Strings.isNotBlank(ip)){
+    public Object getSubnetIp(@PathVariable(value = "id") Long id, @PathVariable(value = "ip") String ip) {
+        if (id != null && Strings.isNotBlank(ip)) {
             Subnet subnet = this.subnetService.selectObjById(id);
-            if(subnet == null){
+            if (subnet == null) {
                 return ResponseUtil.badArgument();
             }
-            if(subnet.getMask() < 24 && subnet.getMask() >= 16){
+            if (subnet.getMask() < 24 && subnet.getMask() >= 16) {
                 String[] str = ip.split("-");
-                if(str[0] != null){
+                if (str[0] != null) {
                     boolean flag = IpUtil.verifyIp(str[0]);
-                    if(flag){
+                    if (flag) {
                         Scanner sc = new Scanner(ip).useDelimiter("\\.");
                         StringBuffer sb = new StringBuffer();
                         sb.append(sc.nextLong()).append(".").append(sc.nextLong()).append(".").append(sc.nextLong());
@@ -534,14 +532,14 @@ public class SubnetManagerController {
                         params.put("end_ip", IpUtil.ipConvertDec(sb.toString()));
                         List<Address> addresses = this.addressService.selectObjByMap(params);
                         Map map = new LinkedHashMap();
-                        for (int i = 1; i <= 255 ; i++) {
+                        for (int i = 1; i <= 255; i++) {
                             StringBuffer sb2 = new StringBuffer(begin_ip);
                             sb2.append("." + i);
                             Optional<Address> obj = addresses.stream().filter(address -> address.getIp().equals(sb2.toString())).findAny();
-                            if(obj.isPresent()){
+                            if (obj.isPresent()) {
                                 Address address = obj.get();
                                 IpDetail ipDetail = this.ipDetailService.selectObjByIp(IpUtil.ipConvertDec(address.getIp()));
-                                if(ipDetail != null){
+                                if (ipDetail != null) {
                                     int time = ipDetail.getTime();
                                     // 每分钟采一次
                                     int hourAll = time / 60;// 一共多少小时
@@ -554,7 +552,7 @@ public class SubnetManagerController {
                                 Map deviceInfo = this.rsmsDeviceUtils.getDeviceInfo(address.getIp());
                                 address.setDeviceInfo(deviceInfo);
                                 map.put(sb2.toString(), address);
-                            }else{
+                            } else {
                                 map.put(sb2.toString(), null);
                             }
                         }
@@ -636,14 +634,14 @@ public class SubnetManagerController {
 
     @ApiOperation("删除网段")
     @DeleteMapping
-    public Object delete(@RequestParam(value = "id") Long id){
+    public Object delete(@RequestParam(value = "id") Long id) {
         Subnet subnet = this.subnetService.selectObjById(id);
-        if(subnet != null){
+        if (subnet != null) {
             // 查询子网ip地址列表
             Map params = new HashMap();
             params.put("subnetId", subnet.getId());
             List<Address> address = this.addressService.selectObjByMap(params);
-            for (Address obj : address){
+            for (Address obj : address) {
                 this.addressService.delete(obj.getId());
             }
 //            // 递归删除所有ip
@@ -671,12 +669,12 @@ public class SubnetManagerController {
         return ResponseUtil.ok();
     }
 
-    public List<Subnet> genericSubnet(Subnet subnet){
+    public List<Subnet> genericSubnet(Subnet subnet) {
         List<Subnet> subnets = this.subnetService.selectSubnetByParentId(subnet.getId());
-        if(subnets.size() > 0){
-            for(Subnet child : subnets){
+        if (subnets.size() > 0) {
+            for (Subnet child : subnets) {
                 List<Subnet> subnetList = genericSubnet(child);
-                if(subnetList.size() > 0){
+                if (subnetList.size() > 0) {
                     child.setSubnetList(subnetList);
                 }
             }
@@ -686,10 +684,10 @@ public class SubnetManagerController {
     }
 
 
-    public void genericDel(Subnet subnet){
+    public void genericDel(Subnet subnet) {
         List<Subnet> childs = this.subnetService.selectSubnetByParentId(subnet.getId());
-        if(childs.size() > 0){
-            for(Subnet child : childs){
+        if (childs.size() > 0) {
+            for (Subnet child : childs) {
                 genericDel(child);
             }
         }
@@ -697,51 +695,51 @@ public class SubnetManagerController {
         params.clear();
         params.put("subnetId", subnet.getId());
         List<Address> addresses = this.addressService.selectObjByMap(params);
-        for (Address address : addresses){
+        for (Address address : addresses) {
             this.addressService.delete(address.getId());
         }
         this.subnetService.delete(subnet.getId());
     }
 
     @GetMapping("/address")
-    public Object subnet(){
+    public Object subnet() {
         // 获取所有子网一级
         List<Subnet> subnets = this.subnetService.selectSubnetByParentId(null);
         List<IpDetail> ipdetails = this.ipDetailService.selectObjByMap(null);
-            if(subnets.size() > 0){
-                for(IpDetail ipDetail : ipdetails){
-                    if(ipDetail.getIp().equals("0.0.0.0")){
-                        continue;
-                    }
-                    String ip = IpUtil.decConvertIp(Long.parseLong(ipDetail.getIp()));
-                    if(!IpUtil.verifyIp(ip)){
-                        continue;
-                    }
-                    // 判断ip地址是否属于子网
-                    for(Subnet subnet : subnets){
-                        genericNoSubnet(subnet, ipDetail);
-                    }
+        if (subnets.size() > 0) {
+            for (IpDetail ipDetail : ipdetails) {
+                if (ipDetail.getIp().equals("0.0.0.0")) {
+                    continue;
+                }
+                String ip = IpUtil.decConvertIp(Long.parseLong(ipDetail.getIp()));
+                if (!IpUtil.verifyIp(ip)) {
+                    continue;
+                }
+                // 判断ip地址是否属于子网
+                for (Subnet subnet : subnets) {
+                    genericNoSubnet(subnet, ipDetail);
                 }
             }
+        }
         return null;
     }
 
-    public void genericNoSubnet(Subnet subnet, IpDetail ipDetail){
+    public void genericNoSubnet(Subnet subnet, IpDetail ipDetail) {
         List<Subnet> childs = this.subnetService.selectSubnetByParentId(subnet.getId());
-        if(childs.size() > 0){
-            for(Subnet child : childs){
+        if (childs.size() > 0) {
+            for (Subnet child : childs) {
                 genericNoSubnet(child, ipDetail);
             }
-        }else{
+        } else {
             // 判断ip是否属于从属子网
             boolean flag = IpUtil.ipIsInNet(IpUtil.decConvertIp(Long.parseLong(ipDetail.getIp())), subnet.getIp() + "/" + subnet.getMask());
-            if(flag){
+            if (flag) {
                 Address obj = this.addressService.selectObjByIp(ipDetail.getIp());
-                if(obj != null){
+                if (obj != null) {
                     obj.setSubnetId(subnet.getId());
                     obj.setIp(null);
                     int i = this.addressService.update(obj);
-                }else{
+                } else {
                     Address address = new Address();
                     System.out.println(IpUtil.decConvertIp(Long.parseLong(ipDetail.getIp())));
                     address.setIp(ipDetail.getIp());
@@ -756,18 +754,18 @@ public class SubnetManagerController {
 
     @ApiOperation("Ip使用率")
     @GetMapping("/picture2")
-    public Object picture2(){
+    public Object picture2() {
         // 根据子网查询address
         List subnetList = new ArrayList();
         List<Subnet> subnets = this.subnetService.selectSubnetByParentId(null);
-        for(Subnet subnet : subnets){
+        for (Subnet subnet : subnets) {
             Set<Long> ids = this.genericSubnet(subnet.getId());
             Map params = new HashMap();
-            if(ids.size() > 0){
+            if (ids.size() > 0) {
                 params.clear();
                 params.put("subnetIds", ids);
                 List<Address> addresses = this.addressService.selectObjByMap(params);
-                if(addresses.size() > 0){
+                if (addresses.size() > 0) {
                     List<String> ips = new ArrayList<>();
                     addresses.forEach((item) -> {
                         ips.add(IpUtil.ipConvertDec(item.getIp()));
@@ -796,14 +794,14 @@ public class SubnetManagerController {
                     int existingSum = unuseds.size() + seldom.size() + unmeant.size() + regular.size();
                     int inexistenceSum = sum - existingSum;
 
-                    float unusedScale =(float)(unuseds.size() + inexistenceSum) / sum;
+                    float unusedScale = (float) (unuseds.size() + inexistenceSum) / sum;
                     Map map = new HashMap();
-                    map.put("unused",  Math.round(unusedScale * 100));
-                    float seldomScale =(float)seldom.size() / sum;
+                    map.put("unused", Math.round(unusedScale * 100));
+                    float seldomScale = (float) seldom.size() / sum;
                     map.put("seldom", Math.round(seldomScale * 100));
-                    float unmeantScale =(float)unmeant.size() / sum;
+                    float unmeantScale = (float) unmeant.size() / sum;
                     map.put("unmeant", Math.round(unmeantScale * 100));
-                    float regularScale =(float)regular.size() / sum;
+                    float regularScale = (float) regular.size() / sum;
                     map.put("regular", Math.round(regularScale * 100));
                     subnetList.add(subnet.setPicture(map));
                 }
@@ -814,19 +812,19 @@ public class SubnetManagerController {
 
     @ApiOperation("Ip使用率")
     @GetMapping("/picture")
-    public Object picture(@RequestParam(value = "subnetId", required = false) Long subnetId){
+    public Object picture(@RequestParam(value = "subnetId", required = false) Long subnetId) {
         // 根据子网查询address
         Set<Long> subnetIds = new HashSet<>();
-        if(subnetId != null){
+        if (subnetId != null) {
             Set<Long> ids = this.genericSubnet(subnetId);
             subnetIds.addAll(ids);
         }
         Map params = new HashMap();
-        if(subnetIds.size() > 0){
+        if (subnetIds.size() > 0) {
             params.clear();
             params.put("subnetIds", subnetIds);
             List<Address> addresses = this.addressService.selectObjByMap(params);
-            if(addresses.size() > 0){
+            if (addresses.size() > 0) {
                 List<String> ips = new ArrayList<>();
                 addresses.forEach((item) -> {
                     ips.add(IpUtil.ipConvertDec(item.getIp()));
@@ -861,20 +859,20 @@ public class SubnetManagerController {
 
                 int inexistenceSum = sum - existingSum;
 
-                float unusedScale =(float)(unuseds.size() + inexistenceSum) / sum;
+                float unusedScale = (float) (unuseds.size() + inexistenceSum) / sum;
 
                 Map map = new HashMap();
-                map.put("unused",  Math.round(unusedScale * 100));
+                map.put("unused", Math.round(unusedScale * 100));
 
-                float seldomScale =(float)seldom.size() / sum;
+                float seldomScale = (float) seldom.size() / sum;
 
                 map.put("seldom", Math.round(seldomScale * 100));
 
-                float unmeantScale =(float)unmeant.size() / sum;
+                float unmeantScale = (float) unmeant.size() / sum;
 
                 map.put("unmeant", Math.round(unmeantScale * 100));
 
-                float regularScale =(float)regular.size() / sum;
+                float regularScale = (float) regular.size() / sum;
 
                 map.put("regular", Math.round(regularScale * 100));
 
@@ -886,20 +884,20 @@ public class SubnetManagerController {
     }
 
 
-
     /**
      * 获取所有从属子网Id
+     *
      * @param id
      * @return
      */
-    public Set<Long> genericSubnet(Long id){
+    public Set<Long> genericSubnet(Long id) {
         Set<Long> ids = new HashSet();
         Subnet subnet = this.subnetService.selectObjById(id);
-        if(subnet != null){
+        if (subnet != null) {
             ids.add(id);
             List<Subnet> childs = this.subnetService.selectSubnetByParentId(subnet.getId());
-            if(childs.size() > 0){
-                for (Subnet obj : childs){
+            if (childs.size() > 0) {
+                for (Subnet obj : childs) {
                     Set<Long> cids = genericSubnet(obj.getId());
                     ids.addAll(cids);
                     ids.add(obj.getId());
@@ -911,43 +909,44 @@ public class SubnetManagerController {
 
     /**
      * 获取从属子网ips
+     *
      * @param id
      * @return
      */
-    public List<Integer> genericSubnetIps(Long id){
+    public List<Integer> genericSubnetIps(Long id) {
         List<Integer> list = new ArrayList();
         Subnet subnet = this.subnetService.selectObjById(id);
-        if(subnet != null){
+        if (subnet != null) {
             // 从属子网
             List<Subnet> subnets = this.subnetService.selectSubnetByParentId(subnet.getId());
-            if(subnets.size() > 0){
-                for (Subnet obj : subnets){
+            if (subnets.size() > 0) {
+                for (Subnet obj : subnets) {
                     List<Integer> clengs = genericSubnetIps(obj.getId());
                     list.addAll(clengs);
                     List<Subnet> csubnets = this.subnetService.selectSubnetByParentId(subnet.getId());
                     // 查询IP addresses in subnets
-                    if(csubnets.size() <= 0 && obj.getMask() >= 16){
+                    if (csubnets.size() <= 0 && obj.getMask() >= 16) {
                         // 获取地址列表
                         // 获取最大Ip地址和最小Ip地址
                         String mask = IpUtil.bitMaskConvertMask(obj.getMask());
                         Map networkMap = IpUtil.getNetworkIpDec(obj.getIp(), mask);
                         String[] ips = IpUtil.getSubnetList(networkMap.get("network").toString(),
                                 obj.getMask());
-                        if(ips.length > 0){
+                        if (ips.length > 0) {
                             list.add(ips.length);
                         }
                     }
                 }
             }
             // 查询IP addresses in subnets
-            if(subnets.size() <= 0 && subnet.getMask() >= 16){
+            if (subnets.size() <= 0 && subnet.getMask() >= 16) {
                 // 获取地址列表
                 // 获取最大Ip地址和最小Ip地址
                 String mask = IpUtil.bitMaskConvertMask(subnet.getMask());
                 Map networkMap = IpUtil.getNetworkIp(subnet.getIp(), mask);
                 String[] ips = IpUtil.getSubnetList(networkMap.get("network").toString(),
                         subnet.getMask());
-                if(ips.length > 0){
+                if (ips.length > 0) {
                     list.add(ips.length);
                 }
             }

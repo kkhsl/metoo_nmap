@@ -9,10 +9,10 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.*;
 
 @RequestMapping("/admin/mongo/article")
 @RestController
@@ -22,6 +22,22 @@ public class ArticleManager {
 
     @Autowired
     private ArticleService articleService;
+
+
+
+    @Test
+    public void testURLEncode(){
+        String keyWord = "嘿嘿&哈哈";
+
+        try {
+            String encode = URLEncoder.encode(keyWord,"UTF-8");
+            System.out.println(encode);
+            String decode = URLDecoder.decode(keyWord,"UTF-8");
+            System.out.println(decode);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
 
     @GetMapping
     public List<Article> test(){
@@ -73,4 +89,11 @@ public class ArticleManager {
         this.articleService.deleteById(id);
     }
 
+    @RequestMapping("/show/{id}/**")
+    public String showResource(@PathVariable String id) {
+
+
+
+        return id;
+    }
 }

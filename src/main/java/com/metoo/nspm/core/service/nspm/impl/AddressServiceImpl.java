@@ -5,7 +5,6 @@ import com.metoo.nspm.core.mapper.nspm.AddressMapper;
 import com.metoo.nspm.core.service.nspm.IAddressService;
 import com.metoo.nspm.core.utils.network.IpUtil;
 import com.metoo.nspm.entity.nspm.Address;
-import com.metoo.nspm.entity.nspm.Terminal;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

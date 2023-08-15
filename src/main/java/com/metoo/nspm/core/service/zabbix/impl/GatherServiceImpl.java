@@ -118,7 +118,7 @@ public class GatherServiceImpl implements IGatherService {
     }
 
     @Override
-    public void gatherMacBatch(Date time)  {
+    public void gatherMacBatch(Date time) {
         StopWatch watch = new StopWatch();
         watch.start();
         this.itemService.gatherMacBatch(time);
@@ -214,7 +214,6 @@ public class GatherServiceImpl implements IGatherService {
 
 
         this.terminalService.syncMacDtToTerminal();
-
 
 
         System.out.println("Mac-copy采集耗时：" + watch.getTime(TimeUnit.SECONDS) + " 秒.");

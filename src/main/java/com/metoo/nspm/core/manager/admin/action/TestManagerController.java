@@ -174,9 +174,16 @@ public class TestManagerController {
         Integer g = new Integer(10);
         System.out.println(j);
         System.out.println(g);
-        System.out.println(j == g);// 如果是引用类型则比较对象的内存地址
+        // 如果是引用类型则比较对象的内存地址
+        System.out.println(j==g);
         System.out.println(j.equals(g));
 
 
+    }
+
+    @Test
+    public void alibabacode(){
+        int INTNUM = 10;
+        System.out.println(INTNUM);
     }
 }

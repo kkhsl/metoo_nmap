@@ -1,5 +1,6 @@
 package com.metoo.nspm.core.manager.admin.action;
 
+import com.alibaba.fastjson.JSONObject;
 import com.metoo.nspm.core.service.nspm.IAccessoryService;
 import com.metoo.nspm.core.service.nspm.ISysConfigService;
 import com.metoo.nspm.core.utils.ResponseUtil;
@@ -16,6 +17,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FileUtils;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -86,6 +88,15 @@ public class FileUploadManagerController {
             return ResponseUtil.badArgument((String)data.get("msg"));
         }
     }
+
+        @Test
+        public void test(){
+            String[] stringArray = {"value1", "value2", "value3"};
+            System.out.println(stringArray.toString());
+            System.out.println(JSONObject.toJSONString(stringArray));
+            String requestBody = String.join(",", stringArray);
+            System.out.println(requestBody);
+        }
 
     public Map upload(@RequestParam(required = false) MultipartFile file, int type) {
         Map map = new HashMap();
