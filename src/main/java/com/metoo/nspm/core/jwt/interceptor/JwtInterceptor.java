@@ -15,7 +15,7 @@ import java.util.Map;
 
 /**
  * <p>
- *     Title: JwtInterceptor.java
+ *     Title: JwtInterceptorConfig.java
  * </p>
  *
  * <p>

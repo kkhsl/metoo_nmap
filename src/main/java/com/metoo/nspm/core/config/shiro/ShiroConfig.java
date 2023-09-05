@@ -161,29 +161,43 @@ public class ShiroConfig {
     }
 
     // 3, 自定义realm
+//    @Bean
+//    public Realm getRealm() {
+//        MyRealm myRealm = new MyRealm();
+//        // 设置Realm使用hash凭证校验匹配器; 问：Realm 不设置hash凭证器会出现什么
+//        HashedCredentialsMatcher hashedCredentialsMatcher = new HashedCredentialsMatcher();
+//        // 设置加密算法 SHA-1、md5
+//        hashedCredentialsMatcher.setHashAlgorithmName("md5");
+//        // 设置加密次数（散列次数）
+//        hashedCredentialsMatcher.setHashIterations(1024);
+//        myRealm.setCredentialsMatcher(hashedCredentialsMatcher);
+//
+//        // 开启缓存管理器
+////        myRealm.setCachingEnabled(true);// 开启全局缓存
+//        // 方式一：EhCache
+//            // 只能实现本地缓存，如果应用服务器宕机，则缓存数据丢失；生产环境使用Redis-实现分布式缓存
+//                // 缓存数据独立于应用服务器之外，提高数据安全性
+////        myRealm.setCacheManager(new EhCacheManager());// EhCache
+////////        方式二：Redis
+////        myRealm.setCacheManager(new RedisCacheManager());// RedisCacheManager
+////        myRealm.setAuthenticationCachingEnabled(true);// 认证缓存
+////        myRealm.setAuthenticationCacheName("authenticationCache");
+////        myRealm.setAuthorizationCachingEnabled(true);// 授权缓存
+////        myRealm.setAuthorizationCacheName("authorizationCache");
+//        return myRealm;
+//    }
+
+
     @Bean
     public Realm getRealm() {
-        MyRealm myRealm = new MyRealm();
-        // 设置Realm使用hash凭证校验匹配器; 问：Realm 不设置hash凭证器会出现什么
-        HashedCredentialsMatcher hashedCredentialsMatcher = new HashedCredentialsMatcher();
-        // 设置加密算法 SHA-1、md5
-        hashedCredentialsMatcher.setHashAlgorithmName("md5");
-        // 设置加密次数（散列次数）
-        hashedCredentialsMatcher.setHashIterations(1024);
-        myRealm.setCredentialsMatcher(hashedCredentialsMatcher);
 
-        // 开启缓存管理器
-//        myRealm.setCachingEnabled(true);// 开启全局缓存
-        // 方式一：EhCache
-            // 只能实现本地缓存，如果应用服务器宕机，则缓存数据丢失；生产环境使用Redis-实现分布式缓存
-                // 缓存数据独立于应用服务器之外，提高数据安全性
-//        myRealm.setCacheManager(new EhCacheManager());// EhCache
-//////        方式二：Redis
-//        myRealm.setCacheManager(new RedisCacheManager());// RedisCacheManager
-//        myRealm.setAuthenticationCachingEnabled(true);// 认证缓存
-//        myRealm.setAuthenticationCacheName("authenticationCache");
-//        myRealm.setAuthorizationCachingEnabled(true);// 授权缓存
-//        myRealm.setAuthorizationCacheName("authorizationCache");
+        MyRealm myRealm = new MyRealm();
+
+        myRealm.setCredentialsMatcher(customCredentialsMatch());// 免密登录
+
+        // jwt
+
+
         return myRealm;
     }
 
@@ -308,12 +322,25 @@ public class ShiroConfig {
      */
     @Bean
     public JwtRealm jwtRealm(){
+
         JwtRealm jwtRealm = new JwtRealm();
         // 设置加密算法
         CredentialsMatcher credentialsMatcher = new JwtCredentialsMatcher();
         // 设置加密次数
         jwtRealm.setCredentialsMatcher(credentialsMatcher);
+
         return jwtRealm;
     }
+
+    // 免密登录
+    @Bean
+    public EasyCredentialsMatch customCredentialsMatch() {
+        EasyCredentialsMatch customCredentialsMatch = new EasyCredentialsMatch();
+        customCredentialsMatch.setHashAlgorithmName("md5");
+        customCredentialsMatch.setHashIterations(1024);
+        customCredentialsMatch.setStoredCredentialsHexEncoded(true);
+        return customCredentialsMatch;
+    }
+
 
 }

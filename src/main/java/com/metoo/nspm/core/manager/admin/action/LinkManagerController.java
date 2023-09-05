@@ -50,7 +50,7 @@ public class LinkManagerController {
 
     @PostMapping
     public Object save(@RequestBody(required = false) Link instance){
-        if(this.checkObjAllFieldsIsNull(instance)){
+        if(checkObjAllFieldsIsNull(instance)){
             return ResponseUtil.ok();
         }
         int i = this.linkService.save(instance);

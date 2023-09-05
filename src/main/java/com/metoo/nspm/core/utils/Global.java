@@ -4,6 +4,9 @@ public class Global {
 
     private static Global global = new Global();
 
+
+    public final static String AES_KEY = "#+NPzwDvPmCJvpY@";
+
     public final static  String BOARDCPU = "boardcpu";
     public static final String BOARDMEM = "boardmem";
     public static final String BOARDTEMP = "boardtemp";

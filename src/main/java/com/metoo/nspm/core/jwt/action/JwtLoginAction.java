@@ -46,7 +46,6 @@ public class JwtLoginAction {
         String token = JwtUtil.getToken(payload);
         response.setHeader("token", token);
 //        response.getWriter().print("TestResponse");
-
         return token;
     }
 

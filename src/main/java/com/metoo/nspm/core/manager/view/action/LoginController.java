@@ -1,29 +1,30 @@
 package com.metoo.nspm.core.manager.view.action;
 
+import com.alibaba.fastjson.JSONObject;
+import com.metoo.nspm.core.config.shiro.EasyTypeToken;
 import com.metoo.nspm.core.service.nspm.ISysConfigService;
 import com.metoo.nspm.core.service.nspm.IUserService;
 import com.metoo.nspm.core.service.zabbix.IGatherService;
-import com.metoo.nspm.core.utils.CaptchaUtil;
-import com.metoo.nspm.core.utils.CookieUtil;
-import com.metoo.nspm.core.utils.ResponseUtil;
+import com.metoo.nspm.core.utils.*;
 import com.metoo.nspm.entity.nspm.User;
 import com.metoo.nspm.vo.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.session.InvalidSessionException;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.Cookie;
@@ -31,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -46,76 +48,225 @@ public class LoginController{
     @Autowired
     private ISysConfigService sysConfigService;
 
+//    @ApiOperation("登录")
+//    @RequestMapping("/login")
+//    public Object login(@RequestParam("userName") String username){
+//        String msg = "";
+//        // 通过安全工具类获取 Subject
+//        Subject subject = SecurityUtils.getSubject();
+//
+//        // 获取当前已登录用户
+//        Session session = SecurityUtils.getSubject().getSession();
+//        session.getStartTimestamp();
+//        if(StringUtils.isEmpty(username)){
+//            return ResponseUtil.badArgument("用户名必填");
+//        }
+//        boolean flag = true;// 当前用户是否已登录
+//        if(subject.getPrincipal() != null && subject.isAuthenticated()){
+//            String userName = subject.getPrincipal().toString();
+//            if(userName.equals(username)){
+//                flag = false;
+//            }
+//        }
+//        if(flag){
+//            EasyTypeToken token = new EasyTypeToken(username);
+//            try {
+//                subject.login(token);
+//                User user = this.userService.findByUserName(username);
+//                return ResponseUtil.ok(user.getId());
+//            } catch (UnknownAccountException e) {
+//                e.printStackTrace();
+//                msg = "用户名错误";
+//                System.out.println("用户名错误");
+//                return new Result(410, msg);
+//            } catch (IncorrectCredentialsException e){
+//                e.printStackTrace();
+//                msg = "密码错误";
+//                System.out.println("密码错误");
+//                return new Result(420, msg);
+//            }
+//        }else{
+//            return new Result(200, "用户已登录");
+//        }
+//    }
+
+    @Test
+    public void test(){
+        String username = "";
+
+        System.out.println(Strings.isNotBlank(username));
+
+        String password = "";
+        String captcha = "";
+        if(Strings.isNotBlank(username) && Strings.isBlank(password) && Strings.isBlank(captcha)){
+            System.out.println(true);
+        }else{
+            System.out.println(false);
+        }
+    }
+
+
+    // 免密登录
     @ApiOperation("登录")
-    @RequestMapping("/login")
+    @PostMapping("/login")
     public Object login(HttpServletRequest request, HttpServletResponse response,
                         String username, String password, @ApiParam("验证码") String captcha, String isRememberMe){
         String msg = "";
         // 通过安全工具类获取 Subject
         Subject subject = SecurityUtils.getSubject();
-
         // 获取当前已登录用户
         Session session = SecurityUtils.getSubject().getSession();
-        String sessionCaptcha = (String) session.getAttribute("captcha");
-        session.getStartTimestamp();
-        if(StringUtils.isEmpty(username)){
-            return ResponseUtil.badArgument("用户名必填");
-        }
-        if(StringUtils.isEmpty(password)){
-            return ResponseUtil.badArgument("密码必填");
-        }
-        if(StringUtils.isEmpty(captcha)){
-            return ResponseUtil.badArgument("验证码必填");
-        }
-        if(!org.springframework.util.StringUtils.isEmpty(captcha) && !StringUtils.isEmpty(sessionCaptcha)){
-            if(sessionCaptcha.toUpperCase().equals(captcha.toUpperCase())){
-                boolean flag = true;// 当前用户是否已登录
-                if(subject.getPrincipal() != null && subject.isAuthenticated()){
-                    String userName = subject.getPrincipal().toString();
-                    if(userName.equals(username)){
-                        flag = false;
-                    }
-                    }
-                    if(flag){
-                        UsernamePasswordToken token = new UsernamePasswordToken(username,password);
-                        try {
-                            if(isRememberMe != null && isRememberMe.equals("1")){
-                                token.setRememberMe(true);
-                                // 或 UsernamePasswordToken token = new UsernamePasswordToken(username,password,true);
-                            }else{
-                                token.setRememberMe(false);
-                            }
-                            subject.login(token);
-                            session.removeAttribute("captcha");
-                            Cookie cookie = new Cookie("access_token", this.sysConfigService.select().getNspmToken().trim());
-                            cookie.setMaxAge(43200);
-//                            cookie.setPath("/");
-//                            cookie.setDomain("192.168.5.101");
-                            response.addCookie(cookie);
-                            User user = this.userService.findByUserName(username);
-                            return ResponseUtil.ok(user.getId());
-                            //  return "redirect:/index.jsp";
-                        } catch (UnknownAccountException e) {
-                            e.printStackTrace();
-                        msg = "用户名错误";
-                        System.out.println("用户名错误");
-                        return new Result(410, msg);
-                    } catch (IncorrectCredentialsException e){
-                        e.printStackTrace();
-                        msg = "密码错误";
-                        System.out.println("密码错误");
-                        return new Result(420, msg);
-                    }
-                }else{
-                    return new Result(200, "用户已登录");
+        EasyTypeToken token = null;
+        if(Strings.isNotBlank(username) && Strings.isBlank(password) && Strings.isBlank(captcha)){
+            //  用户名解密
+            try {
+                String decrypt_username = AesEncryptUtils.decrypt(username, Global.AES_KEY);
+                if(decrypt_username != null){
+                    Map params = JSONObject.parseObject(decrypt_username, Map.class);
+                    token = new EasyTypeToken(params.get("username").toString());
+                    username = params.get("username").toString();
                 }
-            }else{
-                return new Result(430, "验证码错误");
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }else{
-            return new Result(400,  "Captcha has expired");
+            String sessionCaptcha = (String) session.getAttribute("captcha");
+            session.getStartTimestamp();
+            if(StringUtils.isEmpty(username)){
+                return ResponseUtil.badArgument("用户名必填");
+            }
+            if(StringUtils.isEmpty(password)){
+                return ResponseUtil.badArgument("密码必填");
+            }
+            if(StringUtils.isEmpty(captcha)){
+                return ResponseUtil.badArgument("验证码必填");
+            }
+            if(!org.springframework.util.StringUtils.isEmpty(captcha) && !StringUtils.isEmpty(sessionCaptcha)){
+                if(sessionCaptcha.toUpperCase().equals(captcha.toUpperCase())){
+                    boolean flag = true;// 当前用户是否已登录
+                    if(subject.getPrincipal() != null && subject.isAuthenticated()){
+                        String userName = subject.getPrincipal().toString();
+                        if(userName.equals(username)){
+                            flag = false;
+                        }
+                    }
+                    if(flag){
+
+                        if(isRememberMe != null && isRememberMe.equals("1")){
+//                            token.setRememberMe(true);
+                            token = new EasyTypeToken(username, password, true);
+                            // 或 UsernamePasswordToken token = new UsernamePasswordToken(username,password,true);
+                        }else{
+//                            token.setRememberMe(false);
+                            token = new EasyTypeToken(username, password, false);
+                        }
+
+
+                        try {
+                            session.removeAttribute("captcha");
+                        } catch (InvalidSessionException e) {
+                            e.printStackTrace();
+                        }
+                    }else{
+                        return new Result(200, "用户已登录");
+                    }
+                }else{
+                    return new Result(430, "验证码错误");
+                }
+            }else{
+                return new Result(400,  "Captcha has expired");
+            }
         }
+
+        try {
+            subject.login(token);
+            User user = this.userService.findByUserName(username);
+            return ResponseUtil.ok(user.getId());
+            //  return "redirect:/index.jsp";
+        } catch (UnknownAccountException e) {
+            e.printStackTrace();
+            msg = "用户名错误";
+            System.out.println("用户名错误");
+            return new Result(410, msg);
+        } catch (IncorrectCredentialsException e){
+            e.printStackTrace();
+            msg = "密码错误";
+            System.out.println("密码错误");
+            return new Result(420, msg);
+        }
+
     }
+
+//    @ApiOperation("登录")
+//    @RequestMapping("/login")
+//    public Object login(HttpServletRequest request, HttpServletResponse response,
+//                        String username, String password, @ApiParam("验证码") String captcha, String isRememberMe){
+//        String msg = "";
+//        // 通过安全工具类获取 Subject
+//        Subject subject = SecurityUtils.getSubject();
+//
+//        // 获取当前已登录用户
+//        Session session = SecurityUtils.getSubject().getSession();
+//        String sessionCaptcha = (String) session.getAttribute("captcha");
+//        session.getStartTimestamp();
+//        if(StringUtils.isEmpty(username)){
+//            return ResponseUtil.badArgument("用户名必填");
+//        }
+//        if(StringUtils.isEmpty(password)){
+//            return ResponseUtil.badArgument("密码必填");
+//        }
+//        if(StringUtils.isEmpty(captcha)){
+//            return ResponseUtil.badArgument("验证码必填");
+//        }
+//        if(!org.springframework.util.StringUtils.isEmpty(captcha) && !StringUtils.isEmpty(sessionCaptcha)){
+//            if(sessionCaptcha.toUpperCase().equals(captcha.toUpperCase())){
+//                boolean flag = true;// 当前用户是否已登录
+//                if(subject.getPrincipal() != null && subject.isAuthenticated()){
+//                    String userName = subject.getPrincipal().toString();
+//                    if(userName.equals(username)){
+//                        flag = false;
+//                    }
+//                    }
+//                    if(flag){
+//                        UsernamePasswordToken token = new UsernamePasswordToken(username,password);
+//                        try {
+//                            if(isRememberMe != null && isRememberMe.equals("1")){
+//                                token.setRememberMe(true);
+//                                // 或 UsernamePasswordToken token = new UsernamePasswordToken(username,password,true);
+//                            }else{
+//                                token.setRememberMe(false);
+//                            }
+//                            subject.login(token);
+//                            session.removeAttribute("captcha");
+//                            Cookie cookie = new Cookie("access_token", this.sysConfigService.select().getNspmToken().trim());
+//                            cookie.setMaxAge(43200);
+////                            cookie.setPath("/");
+////                            cookie.setDomain("192.168.5.101");
+//                            response.addCookie(cookie);
+//                            User user = this.userService.findByUserName(username);
+//                            return ResponseUtil.ok(user.getId());
+//                            //  return "redirect:/index.jsp";
+//                        } catch (UnknownAccountException e) {
+//                            e.printStackTrace();
+//                        msg = "用户名错误";
+//                        System.out.println("用户名错误");
+//                        return new Result(410, msg);
+//                    } catch (IncorrectCredentialsException e){
+//                        e.printStackTrace();
+//                        msg = "密码错误";
+//                        System.out.println("密码错误");
+//                        return new Result(420, msg);
+//                    }
+//                }else{
+//                    return new Result(200, "用户已登录");
+//                }
+//            }else{
+//                return new Result(430, "验证码错误");
+//            }
+//        }else{
+//            return new Result(400,  "Captcha has expired");
+//        }
+//    }
 
     @Autowired
     private IGatherService gatherService;
@@ -168,7 +319,7 @@ public class LoginController{
         if(subject.getPrincipal() != null){
             // 清除cookie
             subject.logout(); // 退出登录
-            CookieUtil.removeCookie(request, response, "access_token");
+//            CookieUtil.removeCookie(request, response, "access_token");
             CookieUtil.removeCookie(request, response, "JSESSIONID");
             return ResponseUtil.ok();
         }else{
