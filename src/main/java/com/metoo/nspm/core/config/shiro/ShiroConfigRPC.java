@@ -164,7 +164,7 @@
 //        myRealm.setCredentialsMatcher(hashedCredentialsMatcher);
 //
 //        // 开启缓存管理器
-//        myRealm.setCachingEnabled(true);// 开启全局缓存
+//        myRealm.setCachingEnabled (true);// 开启全局缓存
 //        // 方式一：EhCache
 //            // 只能实现本地缓存，如果应用服务器宕机，则缓存数据丢失；生产环境使用Redis-实现分布式缓存
 //                // 缓存数据独立于应用服务器之外，提高数据安全性

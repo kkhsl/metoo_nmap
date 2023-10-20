@@ -109,7 +109,7 @@ public class RedisManager {
      */
     public Long del(final String key) {
         if (StringUtils.isEmpty(key)) {
-            return 0l;
+            return 0L;
         }
         Long delNum = redisTemplate.execute(new RedisCallback<Long>() {
             @Override

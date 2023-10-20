@@ -34,8 +34,8 @@ public class RsmsDevice extends IdEntity {
 
     @ApiModelProperty("设备类型")
     private Long deviceTypeId;
-    @ExcelImport("设备类型")
 
+    @ExcelImport("设备类型")
     @ExcelExport(value = "设备类型名称", sort = 5)
     @ApiModelProperty("设备类型名称")
     private String deviceTypeName;

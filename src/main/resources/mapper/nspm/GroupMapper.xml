@@ -52,7 +52,7 @@
         branchName = #{name}
     </select>
 
-    <select id="queryChild" parameterType="long" resultMap="Base_Result_Map">
+    <select id="queryChild" parameterType="java.lang.Long" resultMap="Base_Result_Map">
         SELECT <include refid="Base_Column_List"/>
         FROM metoo_group obj
         <where>

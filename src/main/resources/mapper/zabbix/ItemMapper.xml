@@ -469,7 +469,8 @@
 
     <select id="gatherItemByTag" parameterType="java.util.Map" resultMap="ItemArp_Result_Map">
             SELECT item_external.*,
-                IF(item_external.tag = #{index},(
+                IF(item_external.tag = #{index},
+                (
                     SELECT `value`
                     FROM item_tag tag_inner
                     WHERE itemid in (

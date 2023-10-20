@@ -2,6 +2,7 @@ package com.metoo.nspm.core.mapper.nspm;
 
 import com.metoo.nspm.entity.nspm.Group;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,7 @@ public interface GroupMapper {
 
     List<Group> selectObjByMap(Map params);
 
-    List<Group> queryChild(Long id);
+    List<Group> queryChild(@Param("parentId")Long id);
 
     boolean save(Group instance);
 
